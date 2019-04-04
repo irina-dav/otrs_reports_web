@@ -1,0 +1,105 @@
+﻿@model ReportViewModel
+@{
+    Layout = "_Layout";
+}
+@section head {
+}
+<div class="container col-11 pt-3 pb-5">
+    <h2>Закрытые заявки за период</h2>  
+    <form class="small col-6">
+        <div class="form-row col-6 align-content-sm-start">
+            <div class="form-group col-6">
+                <label class="col-form-label" for="ReportDateFrom">Период закрытия с</label>
+                <input type="date" class="form-control form-control-sm rounded-0" asp-for="ReportDateFrom" />
+            </div>
+            <div class="form-group col-6">
+                <label class="col-form-label" for="ReportDateTo">Период закрытия по</label>
+                <input type="date" class="form-control form-control-sm rounded-0" asp-for="ReportDateTo" />
+            </div>
+        </div>
+        <div class="form-group col-6">
+            <button type="button" class="form-control form-control-sm  btn btn-outline-secondary btn-sm rounded-0 col-6"
+                    data-toggle="collapse" href="#collapseUsers" role="button" aria-expanded="false" aria-controls="collapseUsers">
+                <div data-toggle="tooltip" title="По умолчанию все" data-placement="top" data-type="info">Выбрать исполнителей</div>
+            </button>
+            <div class="collapse" id="collapseUsers">
+                <div class="card-body">
+                    <select class="form-control " asp-for="Users" asp-items="Model.Users" size="10"></select>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-6">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input rounded-0" asp-for="GroupByCompletedUser">
+                <label class="form-check-label" for="GroupByCompletedUser">Группировать по исполнителям</label>
+            </div>
+        </div>
+        <div class="form-group col-6">
+            <input id="btnFilter" type="button" class="form-control form-control-sm btn btn-primary btn-sm rounded-0 col-6" value="Сформировать" />
+        </div>
+    </form>
+    <partial name="_LoadingProgress" />
+    <div id="tickets"> </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+
+        $('[data-toggle="tooltip"]').each(function () {
+            var options = {
+                html: true
+            };
+            if ($(this)[0].hasAttribute('data-type')) {
+                options['template'] =
+                    '<div class="tooltip ' + $(this).attr('data-type') + '" role="tooltip">' +
+                    '	<div class="tooltip-arrow"></div>' +
+                    '	<div class="tooltip-inner"></div>' +
+                    '</div>';
+            }
+            $(this).tooltip(options);
+        });
+
+        var pleaseWait = $('#loadingProcess');
+
+        showPleaseWait = function () {
+            pleaseWait.modal('show');
+        };
+
+        hidePleaseWait = function () {
+            pleaseWait.modal('hide');
+        };
+
+        GetTickets();
+
+        $('#btnFilter').on('click', function (e) {           
+            GetTickets();
+        });
+
+        function GetTickets() {
+            var filters = {
+                ClosedDateFrom: $('#ReportDateFrom').val(),
+                ClosedDateTo: $('#ReportDateTo').val(),
+                ClosedByUsers: $('#Users').val(),
+                GroupByCompletedUser: $('#GroupByCompletedUser').prop('checked')
+            };
+            console.log(filters);
+            showPleaseWait();
+            $.ajax({
+                url: '/Report/ClosedTickets',
+                type: 'POST',
+                cache: false,
+                async: true,
+                dataType: "html",
+                data: filters
+            })
+                .done(function (result) {
+                    $('#tickets').html(result);                   
+                    hidePleaseWait();
+                }).fail(function (xhr) {
+                    console.log('error : ' + xhr.status + ' - '
+                        + xhr.statusText + ' - ' + xhr.responseText);
+                });
+        }
+    });
+</script>
