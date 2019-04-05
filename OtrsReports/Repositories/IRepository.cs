@@ -8,13 +8,13 @@ namespace OtrsReports.Repositories
 {
     public interface IRepository
     {
-        IEnumerable<Ticket> Tickets { get; }
-        IEnumerable<Article> Articles { get; }
-        IEnumerable<User> Users { get; }
+        IQueryable<Ticket> Tickets { get; }
+        IQueryable<Article> Articles { get; }
+        IQueryable<User> Users { get; }
 
         Ticket GetTicket(int id);
 
-        IEnumerable<Ticket> GetClosedTickets(ReportFilter filters);
+        IQueryable<Ticket> GetClosedTickets(ReportFilter filters);
 
         IEnumerable<Article> GetdArticlesClosure(ReportFilter filter);
     }

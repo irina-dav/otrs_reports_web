@@ -12,13 +12,11 @@ namespace OtrsReports.Models
         [Column("id")]
         public int Id { get; set; }
 
-        //[Column("ticket_id")]
         public int ticket_id { get; set; }
 
         [ForeignKey("ticket_id")]
         public virtual Ticket Ticket { get; set; }
 
-        //[Column("CreatedBy")]
         public int create_by { get; set; }
 
         [ForeignKey("create_by")]

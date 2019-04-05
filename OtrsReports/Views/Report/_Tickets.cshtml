@@ -14,7 +14,11 @@
         data-custom-sort="customSort"
         data-sort-order="desc"
         data-show-export="true"
-        data-pagination="false"
+        data-pagination="true"
+        data-page-size="500"
+        data-pagination-v-align="both"
+        data-show-pagination-switch="false"
+        data-page-list="[]"
         data-search="false">
     <thead>
         <tr>
@@ -78,18 +82,25 @@
 
     $(document).ready(function () {
 
-        var table = $('#list');
-        table.bootstrapTable();
+        formatTable();
 
-        function CountRows() {
+        function formatTable() {
             var table = $('#list');
-            console.log($(table).find('.groupBy').length);
-            $(table).find('.groupBy').each(function (index, value) {
-                var groupRowCount = 0;
-                groupRowCount = $(this).nextUntil(".groupBy").length;
-                var td = $(this).children('td');
-                $(td).html($(td).html() + " [" + groupRowCount + "]");
+            table.bootstrapTable({
+                onPostBody: function () {
+                    hidePleaseWait();
+                },
+
+                formatLoadingMessage: function () {
+                    return 'Загрузка данных...';
+                },
+                formatNoMatches: function () {
+                    return 'Записей не найдено. Задайте параметры фильтра и нажмите кнопку Сформировать';
+                },
+                formatShowingRows: function (pageFrom, pageTo, totalRows) {
+                    return 'Показаны заявки с ' + pageFrom + ' по ' + pageTo;
+                }
             });
-        }
+        }        
     });
 </script>

@@ -86,7 +86,7 @@
             console.log(filters);
             showPleaseWait();
             $.ajax({
-                url: '/Report/ClosedTickets',
+                url: "@Url.Action("ClosedTickets", "Report")",
                 type: 'POST',
                 cache: false,
                 async: true,
@@ -95,7 +95,6 @@
             })
                 .done(function (result) {
                     $('#tickets').html(result);                   
-                    hidePleaseWait();
                 }).fail(function (xhr) {
                     console.log('error : ' + xhr.status + ' - '
                         + xhr.statusText + ' - ' + xhr.responseText);

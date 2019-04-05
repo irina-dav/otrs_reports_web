@@ -49,6 +49,7 @@ namespace OtrsReports
 
             app.UseDeveloperExceptionPage();           
             app.UseStatusCodePages();
+            app.UsePathBase(Configuration["PathBase"]);
             app.UseStaticFiles();
 
             //app.UseSession();
@@ -58,10 +59,7 @@ namespace OtrsReports
             {
                 routes.MapRoute(
                     name: "main",
-                    template: "{controller=Report}/{action=Index}");
-                routes.MapRoute(
-                    name: "otrs",
-                    template: "otrs/{controller=Report}/{action=Index}");
+                    template: "{controller=Report}/{action=Index}");               
             });
         }
     }

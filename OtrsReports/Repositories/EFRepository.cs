@@ -16,42 +16,28 @@ namespace OtrsReports.Repositories
             context = ctx;
         }
 
-        public IEnumerable<Ticket> Tickets => context.Tickets.Include(t => t.Articles);
-        public IEnumerable<Article> Articles => context.Articles.Include(t => t.Ticket).Include(t => t.User);
-        public IEnumerable<User> Users => context.Users;
+        public IQueryable<Ticket> Tickets => context.Tickets.Include(t => t.Articles);
+        public IQueryable<Article> Articles => context.Articles.Include(t => t.Ticket).Include(t => t.User);
+        public IQueryable<User> Users => context.Users;
 
         public Ticket GetTicket(int id)
         {
             return context.Tickets.FirstOrDefault(t => t.Id == id);
         }
 
-        public IEnumerable<Ticket> GetClosedTickets(ReportFilter filter)
+        public IQueryable<Ticket> GetClosedTickets(ReportFilter filter)
         {
-            List<Ticket> tickets = Articles
+            var tickets = Articles
                     .Where(a => a.Subject == "Закрыть" && a.CreateDateTime >= filter.ClosedDateFrom && a.CreateDateTime <= filter.ClosedDateTo)
-                    .Select(t => t.Ticket).ToList();            
+                    .Select(t => t.Ticket);            
 
             return tickets;
         }
 
         public IEnumerable<Article> GetdArticlesClosure(ReportFilter filter)
         {
-            /* List<Article> articles = Articles.Where(a => a.Subject == "Закрыть" && a.CreateDateTime >= filter.ClosedDateFrom && a.CreateDateTime <= filter.ClosedDateTo).ToList();
-             List<Ticket> tickets_wrong_ended = Tickets.Where(t => t.StateId == 2 && !t.Articles.Any(a => a.Subject == "Закрыть")).ToList();
-             List<Article> articles_wrong_ended = tickets_wrong_ended
-                 .Select(t => t.Articles
-                              .LastOrDefault(a => a.CreateDateTime >= filter.ClosedDateFrom && a.CreateDateTime <= filter.ClosedDateTo && a.Subject.EndsWith("успешно закрыта")))
-                 .ToList();
-             articles.AddRange(articles_wrong_ended);
-             articles.RemoveAll(a => a == null);
-             if (filter.ClosedByUsers != null)
-             {
-                 articles = articles.Where(a => filter.ClosedByUsers.Contains(a.create_by)).ToList();
-             }
-             return articles;*/
-            List<Article> articlesSuccessClosed = Articles
-                .Where(a => a.Subject.EndsWith("успешно закрыта") && a.CreateDateTime >= filter.ClosedDateFrom && a.CreateDateTime <= filter.ClosedDateTo)
-                .ToList();
+            var articlesSuccessClosed = Articles
+                .Where(a => a.Subject.EndsWith("успешно закрыта") && a.CreateDateTime >= filter.ClosedDateFrom && a.CreateDateTime <= filter.ClosedDateTo);
             List<Article> articles = new List<Article>();
             foreach (var grpTicket in articlesSuccessClosed.GroupBy(a => a.Ticket))
             {
